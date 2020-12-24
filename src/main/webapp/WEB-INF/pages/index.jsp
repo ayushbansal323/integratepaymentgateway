@@ -7,7 +7,7 @@
     <meta name="description" content="">
     <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
     <meta name="generator" content="Jekyll v4.1.1">
-    <title>Checkout example · Bootstrap</title>
+    <title>Checkout Paysafe</title>
     <link rel="canonical" href="https://getbootstrap.com/docs/4.5/examples/checkout/">
 <script src="https://hosted.test.paysafe.com/checkout/v2/paysafe.checkout.min.js"></script>
     <!-- Bootstrap core CSS -->
@@ -353,12 +353,12 @@
             <label for="amount">Amount</label>
             <input type="number" class="form-control" id="amount" placeholder="10" required>
             <div class="invalid-feedback">
-              Amount code required.
+              Amount required.
             </div>
           </div>
         
         <hr class="mb-4">
-        <button class="btn btn-primary btn-lg btn-block" type="submit">Continue to checkout</button>
+        <button class="btn btn-primary btn-lg btn-block" type="submit" id="submit" disabled>Continue to checkout</button>
       </form>
     </div>
   </div>
@@ -378,6 +378,7 @@
 	  'use strict'
 
 	  window.addEventListener('load', function () {
+		  document.getElementById("submit").disabled=false;
 	    // Fetch all the forms we want to apply custom Bootstrap validation styles to
 	    var forms = document.getElementsByClassName('needs-validation')
 
@@ -432,16 +433,16 @@ function handleSubmit()
                     "email": email,
                 }
                 
-                checkout(result.singleUseCustomerToken, billingAddress, customer, amount, result.merchantRefNum)
+                payment(result.singleUseCustomerToken, billingAddress, customer, amount, result.merchantRefNum)
             }
             else {
-                alert("Please keep in mind "+result.status+"-----" + result.id)
+                alert("Please fill the form correctly ")
             }
         }
     });
 }
 
-function checkout(token, billingAddress, customer, amount, uuid) {
+function payment(token, billingAddress, customer, amount, uuid) {
 
     console.log( "In Checkout function" );
     console.log( token );
@@ -507,7 +508,7 @@ function checkout(token, billingAddress, customer, amount, uuid) {
             });
         }
         else {
-            alert("Please keep in mind that payment -----" + error.detailedMessage)
+            alert("Error occured while doing payment please try after some time -----" + error.detailedMessage)
             console.error("error :" + error);
         }
     }, function (stage, expired) {

@@ -27,44 +27,17 @@ public class CustomerAPI {
 	
 	public String getCustomerID(String pstrEmail)
 	{
-		String url = PaymentConstant.BASE_PAYSAFE_URL + PaymentConstant.CREATE_CUSTOMER_URL;
+		String lstrUrl = PaymentConstant.BASE_PAYSAFE_URL + PaymentConstant.SLASH + PaymentConstant.CUSTOMERS;
 
-        // create new http header and set content type to application/json
-        HttpHeaders lHttpHeaders = new HttpHeaders();
-        lHttpHeaders.setContentType(MediaType.APPLICATION_JSON);
-        lHttpHeaders.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
-
-        // set basic authorization with api key and its value
-        lHttpHeaders.setBasicAuth( PaymentConstant.API_KEY_ID, PaymentConstant.API_KEY_PASSWORD );
-
+		HttpHeaders lHttpHeaders = getHttpHeaders();
         // create a new map for the body of the request and put all the values received from the user in the map
         CustomerRequest lCustomerRequest = new CustomerRequest();
-        Random lRandom = new Random(System.currentTimeMillis());
-        lCustomerRequest.setMerchantCustomerId( String.valueOf( lRandom.nextInt() ) );
-        lCustomerRequest.setLocale( "en_US" );
-        lCustomerRequest.setFirstName( "abc" );
-        lCustomerRequest.setMiddleName( "pqr" );
-        lCustomerRequest.setLastName( "xyz" );
-        Date dob = new Date( 2, 3, 1998 );
-        lCustomerRequest.setDateOfBirth( dob );
         lCustomerRequest.setEmail( pstrEmail );
-        lCustomerRequest.setCellPhone( "9056482124" );
-        lCustomerRequest.setGender( "M" );
-        lCustomerRequest.setNationality( "Canadian" );
-        lCustomerRequest.setPhone( "777-444-8888" );
-        lCustomerRequest.setIp( "192.0.126.111" );
-
         // convert request object in to json object
         ObjectMapper lObjectMapper = new ObjectMapper();
         String lstrJsonString = null;
         try {
         	lstrJsonString = lObjectMapper.writeValueAsString(lCustomerRequest);
-        }
-        catch (JsonMappingException e) {
-            e.printStackTrace();
-        }
-        catch (JsonGenerationException e) {
-            e.printStackTrace();
         }
         catch (IOException e) {
             e.printStackTrace();
@@ -72,46 +45,37 @@ public class CustomerAPI {
         System.out.println( lstrJsonString );
 
         // build the request
-        HttpEntity< String > entity = new HttpEntity< String >( lstrJsonString, lHttpHeaders );
-
+        HttpEntity< String > lHttpEntity = new HttpEntity< String >( lstrJsonString, lHttpHeaders );
         RestTemplate lRestTemplate = new RestTemplate();
         // send POST request
-        ResponseEntity< CustomerResponse > lResponseEntity = lRestTemplate.postForEntity( url, entity, CustomerResponse.class );
+        ResponseEntity< CustomerResponse > lResponseEntity = lRestTemplate.postForEntity( lstrUrl, lHttpEntity, CustomerResponse.class );
 
         // check if user is successfully created
         if( lResponseEntity.getStatusCode() == HttpStatus.CREATED ){
-
             // get the response
             CustomerResponse lCustomerResponse = lResponseEntity.getBody();
-
             // create new record for the customer in local database and set it's attributes values
             return lCustomerResponse.getId();
         }
         else {
-
             System.out.println( "failed user creation" );
-
             return null;
         }
 
 	}
 
 	public CustomerTokenResponse getSingleUseCustomerTokenFromCustomerId(String mstrCustomerId) {
-		String mstrURL = PaymentConstant.BASE_PAYSAFE_URL + "/customers/" + mstrCustomerId + "/singleusecustomertokens" ;
+		String mstrURL = PaymentConstant.BASE_PAYSAFE_URL + PaymentConstant.SLASH + 
+						 PaymentConstant.CUSTOMERS + PaymentConstant.SLASH + 
+						 mstrCustomerId + PaymentConstant.SLASH + 
+						 PaymentConstant.SINGLE_USE_COSTOMER_TOKEN ;
 
-        // create new http header and set content type to application/json
-        HttpHeaders lHttpHeaders = new HttpHeaders();
-        lHttpHeaders.setContentType(MediaType.APPLICATION_JSON);
-        lHttpHeaders.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
-
-        // set basic authorization with api key and its value
-        lHttpHeaders.setBasicAuth( PaymentConstant.API_KEY_ID, PaymentConstant.API_KEY_PASSWORD );
-
+		HttpHeaders lHttpHeaders = getHttpHeaders();
         // create request object
         CustomerTokenRequest lCustomerTokenRequest = new CustomerTokenRequest();
         Random lRandom = new Random(System.currentTimeMillis());
         lCustomerTokenRequest.setMerchantRefNum( String.valueOf( lRandom.nextInt() ) );
-        lCustomerTokenRequest.setPaymentTypes( Arrays.asList( "CARD" ) );
+        lCustomerTokenRequest.setPaymentTypes( Arrays.asList( PaymentConstant.CARD ) );
 
         // convert request object in to json object
         ObjectMapper lObjectMapper = new ObjectMapper();
@@ -119,12 +83,6 @@ public class CustomerAPI {
         try {
 
         	lstrJsonString = lObjectMapper.writeValueAsString( lCustomerTokenRequest );
-        }
-        catch (JsonMappingException e) {
-            e.printStackTrace();
-        }
-        catch (JsonGenerationException e) {
-            e.printStackTrace();
         }
         catch (IOException e) {
             e.printStackTrace();
@@ -144,5 +102,17 @@ public class CustomerAPI {
             return lResponseEntity.getBody();
         }
         return null;
+	}
+	
+	
+	private HttpHeaders getHttpHeaders()
+	{
+		// create new http header and set content type to application/json
+        HttpHeaders lHttpHeaders = new HttpHeaders();
+        lHttpHeaders.setContentType(MediaType.APPLICATION_JSON);
+        lHttpHeaders.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
+        // set basic authorization with api key and its value
+        lHttpHeaders.setBasicAuth( PaymentConstant.API_KEY_ID, PaymentConstant.API_KEY_PASSWORD );
+        return lHttpHeaders;
 	}
 }

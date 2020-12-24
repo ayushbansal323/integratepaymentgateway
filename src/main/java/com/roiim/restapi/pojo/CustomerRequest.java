@@ -1,5 +1,7 @@
 package com.roiim.restapi.pojo;
 
+import java.util.Random;
+
 public class CustomerRequest {
 	private String merchantCustomerId;
 
@@ -25,7 +27,26 @@ public class CustomerRequest {
 
 	private String cellPhone;
 	
-    public String getMerchantCustomerId() {
+    public CustomerRequest() {
+		super();
+        this.locale = "en_US" ;
+        this.firstName = "abc" ;
+        this.middleName = "pqr" ;
+        this.lastName = "xyz" ;
+        Random lRandom = new Random(System.currentTimeMillis());
+        this.merchantCustomerId = String.valueOf( lRandom.nextInt() ) ;
+        Date lDob = new Date( 2, 3, 1998 );
+        this.setDateOfBirth( lDob );
+        
+		this.cellPhone = "9056482124";
+		this.gender = "M" ;
+		this.nationality = "Canadian" ;
+		this.phone = "777-444-8888" ;
+		this.ip = "192.0.126.111" ;
+		// TODO Auto-generated constructor stub
+	}
+
+	public String getMerchantCustomerId() {
         return merchantCustomerId;
     }
 

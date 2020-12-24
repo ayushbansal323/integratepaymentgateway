@@ -26,7 +26,7 @@ public class PaymentAPI {
         System.out.println( "In make payment" );
 
         // create an url for the payemnt api
-        String mstrUrl = PaymentConstant.BASE_PAYSAFE_URL + "/payments";
+        String mstrUrl = PaymentConstant.BASE_PAYSAFE_URL + PaymentConstant.SLASH + PaymentConstant.PAYMENTS;
 
         // create new http header and set content type to application/json
         HttpHeaders lHttpHeaders = new HttpHeaders();
